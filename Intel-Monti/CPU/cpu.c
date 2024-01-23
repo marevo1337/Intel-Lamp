@@ -23,8 +23,6 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
     while (1)
     {
         char opCode = read_memory_ram(ramGateway, cpu.programCounter.data);
-
-        printf("%x\n", opCode);
         
         switch (opCode)
         {
