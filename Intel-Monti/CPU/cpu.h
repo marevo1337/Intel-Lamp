@@ -5,31 +5,27 @@
 
 #include "../Memory/Register.h"
 #include "../Memory/RAM.h"
-
-#define ZERO_FLAG 1
-#define SIGN_FLAG 2
-#define PARTY_FLAG 3
-#define AUXILIARY_CARRY 4
+#include "../Tools/BitOperation.h"
 
 struct CPU
 {
 	// General-Purpose Registers
-	Register A_Register;
-	Register B_Register;
-	Register C_Register;
-	Register D_Register;
-	Register E_Register;
+	Register8Bit A_Register;
+	Register8Bit B_Register;
+	Register8Bit C_Register;
+	Register8Bit D_Register;
+	Register8Bit E_Register;
 
 	// General-Purpose Registers and Latched Address Register (HL)
-	Register H_Register;
-	Register L_Register;
+	Register8Bit H_Register;
+	Register8Bit L_Register;
 
 	// Pointer and Index Registers
-	Register stackPointer;
-	Register programCounter;
+	Register16Bit stackPointer;
+	Register16Bit programCounter;
 
 	// Flag register
-	Register flagRegister;
+	FlagRegister flagRegister;
 } typedef CPU;
 
 CPU init_cpu();

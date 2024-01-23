@@ -11,6 +11,9 @@
     <Filter Include="Исходные файлы\CPU">
       <UniqueIdentifier>{49bcb56f-4bc6-4346-a5ac-e7815db43a7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\Tools">
+      <UniqueIdentifier>{83c91e10-696c-4b0b-9858-ac982dffecc0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -28,6 +31,9 @@
     <ClCompile Include="emulator.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Tools\BitOperation.c">
+      <Filter>Исходные файлы\Tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Memory\RAM.h">
@@ -41,6 +47,12 @@
     </ClInclude>
     <ClInclude Include="emulator.h">
       <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\BitOperation.h">
+      <Filter>Исходные файлы\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\Bool.h">
+      <Filter>Исходные файлы\Tools</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

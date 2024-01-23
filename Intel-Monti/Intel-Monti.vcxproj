@@ -132,12 +132,15 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="Memory\RAM.c" />
     <ClCompile Include="Memory\Register.c" />
+    <ClCompile Include="Tools\BitOperation.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPU\cpu.h" />
     <ClInclude Include="emulator.h" />
     <ClInclude Include="Memory\RAM.h" />
     <ClInclude Include="Memory\Register.h" />
+    <ClInclude Include="Tools\BitOperation.h" />
+    <ClInclude Include="Tools\Bool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -15,8 +15,6 @@ CPU init_cpu()
     cpu.programCounter.data = 0;
     cpu.stackPointer.data = 0;
 
-    cpu.flagRegister.data = 0;
-
     return cpu;
 }
 
@@ -58,6 +56,29 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
             // INR B
             case 0x04:
                 cpu.B_Register.data++;
+                
+                cpu.flagRegister.zeroFlag = (cpu.B_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.B_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.B_Register.data);
+                cpu.flagRegister.auxliaryCarry = is_auxiliary_carry_set(cpu.B_Register.data);
+
+                break;
+            // DCR B
+            case 0x05:
+                cpu.B_Register.data--;
+
+                cpu.flagRegister.zeroFlag = (cpu.B_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.B_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.B_Register.data);
+                cpu.flagRegister.auxliaryCarry = is_auxiliary_carry_set(cpu.B_Register.data);
+
+                break;
+            // MVI B, D8
+            case 0x06:
+                cpu.programCounter.data++;
+                cpu.B_Register.data = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                break;
         }
 
         cpu.programCounter.data++;
