@@ -16,4 +16,5 @@ struct FlagRegister
 	int signFlag;
 	int partyFlag;
 	int auxliaryCarry;
+	char carryFlag;
 } typedef FlagRegister;
