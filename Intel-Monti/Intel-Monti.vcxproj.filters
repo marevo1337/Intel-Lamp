@@ -8,6 +8,9 @@
     <Filter Include="Исходные файлы\Memory">
       <UniqueIdentifier>{b5f36776-ad0d-4c1a-b12a-334f670a8e71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\CPU">
+      <UniqueIdentifier>{49bcb56f-4bc6-4346-a5ac-e7815db43a7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -16,10 +19,28 @@
     <ClCompile Include="Memory\RAM.c">
       <Filter>Исходные файлы\Memory</Filter>
     </ClCompile>
+    <ClCompile Include="Memory\Register.c">
+      <Filter>Исходные файлы\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU\cpu.c">
+      <Filter>Исходные файлы\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="emulator.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Memory\RAM.h">
       <Filter>Исходные файлы\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\Register.h">
+      <Filter>Исходные файлы\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="CPU\cpu.h">
+      <Filter>Исходные файлы\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="emulator.h">
+      <Filter>Исходные файлы</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

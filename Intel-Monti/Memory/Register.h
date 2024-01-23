@@ -1,11 +1,6 @@
 #pragma once
 
-struct Register8Bit
+struct Register
 {
-	char byte;
-} typedef Register8Bit;
-
-struct Register16Bit
-{
-	short dobuleBytes;
-} typedef Register16Bit;
+	int data;
+} typedef Register;

@@ -5,9 +5,9 @@
 
 RAM* init_ram()
 {
-    RAM_MemoryBlock* memoryBlocks = (RAM_MemoryBlock*) malloc(sizeof(RAM_MemoryBlock) * RAM_MEMORY_BLOCK_SIZE);
+    RAM_MemoryBlock* memoryBlocks = (RAM_MemoryBlock*) malloc(sizeof(RAM_MemoryBlock) * RAM_MEMORY_SIZE);
 
-    for (int i = 0; i < RAM_MEMORY_BLOCK_SIZE; i++)
+    for (int i = 0; i < RAM_MEMORY_SIZE; i++)
     {
         memoryBlocks[i].memoryAddress = i + 1;
         memoryBlocks[i].rawByte = 0;
@@ -19,9 +19,9 @@ RAM* init_ram()
     return ram;
 }
 
-char read_memory(RAM* ramPointer, int offset)
+char read_memory_ram(RAM* ramPointer, unsigned short offset)
 {
-    if (offset < 0 || offset > RAM_MEMORY_BLOCK_SIZE)
+    if (offset < 0 || offset > RAM_MEMORY_SIZE)
     {
         return NULL;
     }
@@ -29,11 +29,11 @@ char read_memory(RAM* ramPointer, int offset)
     return ramPointer->blocks[offset].rawByte;
 }
 
-void write_memory(RAM* ramPointer, int offset, char byte)
+void write_memory_ram(RAM* ramPointer, unsigned short offset, char byte)
 {
-    if (offset < 0 || offset > RAM_MEMORY_BLOCK_SIZE)
+    if (offset < 0 || offset > RAM_MEMORY_SIZE)
     {
-        return NULL;
+        return;
     }
 
     ramPointer->blocks[offset].rawByte = byte;
