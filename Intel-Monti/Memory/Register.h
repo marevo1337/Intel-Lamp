@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 struct Register8Bit
 {
 	char data;
@@ -7,7 +9,7 @@ struct Register8Bit
 
 struct Register16Bit
 {
-	short data;
+	uint16_t data;
 } typedef Register16Bit;
 
 struct FlagRegister
@@ -15,6 +17,6 @@ struct FlagRegister
 	int zeroFlag;
 	int signFlag;
 	int partyFlag;
-	int auxliaryCarry;
+	int auxiliaryCarry;
 	char carryFlag;
 } typedef FlagRegister;

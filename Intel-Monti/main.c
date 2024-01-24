@@ -4,7 +4,7 @@ int main()
 {
 	Emulator emulator = init_emulator();
 
-	char program[] = {0x01, 0xFF, 0xFF, 0x02};
+	char program[] = {0x01, 0x03, 0x05, 0x03};
 
 	execute_program(emulator, program, 4);
 
