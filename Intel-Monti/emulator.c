@@ -14,9 +14,15 @@ void free_emulator(Emulator emulator)
     free_ram(emulator.ram);
 }
 
-void execute_program(Emulator emulator, char* opCodesBuffer, int opCodesBufferSize)
+void execute_program(Emulator emulator, char* opCodesBuffer, int opCodesBufferSize, int start)
 {
-    int programStart = 0;
+    int programStart = start;
+
+    if (opCodesBufferSize + programStart >= RAM_MEMORY_SIZE)
+    {
+        printf("%s\n", "[ERROR] Out of range memory size");
+        return;
+    }
 
     // Loading program opcodes into virtual RAM
     for (int i = programStart; i < opCodesBufferSize; i++)

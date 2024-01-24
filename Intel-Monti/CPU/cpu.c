@@ -995,7 +995,7 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
                 cpu.flagRegister.signFlag = (sum < 0);
                 cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
                 cpu.flagRegister.carryFlag = (sum > 0xFF);
-                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(sum);
 
                 cpu.A_Register.data = sum;
 
@@ -1010,7 +1010,7 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
                 cpu.flagRegister.signFlag = (sum < 0);
                 cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
                 cpu.flagRegister.carryFlag = (sum > 0xFF);
-                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(sum);
 
                 cpu.A_Register.data = sum;
 
@@ -1025,7 +1025,7 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
                 cpu.flagRegister.signFlag = (sum < 0);
                 cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
                 cpu.flagRegister.carryFlag = (sum > 0xFF);
-                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(sum);
 
                 cpu.A_Register.data = sum;
 
@@ -1040,7 +1040,7 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
                 cpu.flagRegister.signFlag = (sum < 0);
                 cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
                 cpu.flagRegister.carryFlag = (sum > 0xFF);
-                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(sum);
 
                 cpu.A_Register.data = sum;
 
@@ -1055,7 +1055,7 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
                 cpu.flagRegister.signFlag = (sum < 0);
                 cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
                 cpu.flagRegister.carryFlag = (sum > 0xFF);
-                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(sum);
 
                 cpu.A_Register.data = sum;
 
@@ -1070,7 +1070,7 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
                 cpu.flagRegister.signFlag = (sum < 0);
                 cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
                 cpu.flagRegister.carryFlag = (sum > 0xFF);
-                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(sum);
 
                 cpu.A_Register.data = sum;
 
