@@ -14,6 +14,9 @@
     <Filter Include="Исходные файлы\Tools">
       <UniqueIdentifier>{83c91e10-696c-4b0b-9858-ac982dffecc0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\IO">
+      <UniqueIdentifier>{92487446-4fa3-4ac9-bf83-f50b2d301ef1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -34,6 +37,9 @@
     <ClCompile Include="Tools\BitOperation.c">
       <Filter>Исходные файлы\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="IO\StandartOutput.c">
+      <Filter>Исходные файлы\IO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Memory\RAM.h">
@@ -53,6 +59,9 @@
     </ClInclude>
     <ClInclude Include="Tools\Bool.h">
       <Filter>Исходные файлы\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\StandartOutput.h">
+      <Filter>Исходные файлы\IO</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

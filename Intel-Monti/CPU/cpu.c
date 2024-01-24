@@ -22,7 +22,7 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
 {
     while (1)
     {
-        char opCode = read_memory_ram(ramGateway, cpu.programCounter.data);
+        unsigned char opCode = read_memory_ram(ramGateway, cpu.programCounter.data);
         
         switch (opCode)
         {
@@ -950,27 +950,27 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
             case 0x78:
                 cpu.A_Register.data = cpu.B_Register.data;
                 break;
-            // MOV A,C
+            // MOV A, C
             // Move content of register C to A
             case 0x79:
                 cpu.A_Register.data = cpu.C_Register.data;
                 break;
-            // MOV A,D
+            // MOV A, D
             // Move content of register D to A
             case 0x7a:
                 cpu.A_Register.data = cpu.D_Register.data;
                 break;
-            // MOV A,E
+            // MOV A, E
             // Move content of register E to A
             case 0x7b:
                 cpu.A_Register.data = cpu.E_Register.data;
                 break;
-            // MOV A,H
+            // MOV A, H
             // Move content of register H to A
             case 0x7c:
                 cpu.A_Register.data = cpu.H_Register.data;
                 break;
-            // MOV A,L
+            // MOV A, L
             // Move content of register L to A
             case 0x7d:
                 cpu.A_Register.data = cpu.L_Register.data;
@@ -1073,6 +1073,19 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
                 cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(sum);
 
                 cpu.A_Register.data = sum;
+
+                break;
+            }
+            // OUT D8
+            case 0xd3:
+            {
+                cpu.programCounter.data++;
+                char port = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                if (port == STANDART_OUTPUT_PORT)
+                {
+                    standart_output(cpu.A_Register.data);
+                }
 
                 break;
             }

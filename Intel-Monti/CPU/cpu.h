@@ -5,6 +5,7 @@
 #include "../Memory/Register.h"
 #include "../Memory/RAM.h"
 #include "../Tools/BitOperation.h"
+#include "../IO/StandartOutput.h"
 
 struct CPU
 {

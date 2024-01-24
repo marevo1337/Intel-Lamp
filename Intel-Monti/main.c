@@ -11,7 +11,7 @@ int main(int argv, char* argc)
 	}
 
 	FILE* file = NULL;
-	errno_t errno_file = fopen_s(file, argc[1], "rb");
+	errno_t errno_file = fopen_s(&file, argc[1], "rb");
 	if (errno_file != 0)
 	{
 		printf("%s", "[ERROR] Can not open file");
