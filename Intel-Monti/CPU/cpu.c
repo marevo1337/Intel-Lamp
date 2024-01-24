@@ -261,7 +261,7 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
             // Decrement Double Register DE
             case 0x1b:
             {
-                unsigned short DE = (cpu.D_Register.data << 8) | cpu.E_Register.data;
+                uint16_t DE = (cpu.D_Register.data << 8) | cpu.E_Register.data;
                 DE--;
 
                 cpu.D_Register.data = (DE >> 8) & 0xFF;
@@ -324,9 +324,758 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
             // SHLD adr
             // Store H and L registers direct to memory address specified by D16
             case 0x22:
+            {
+                cpu.programCounter.data++;
+                short high = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                cpu.programCounter.data++;
+                short low = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                uint16_t targetAddress = (high << 8) | low;
+
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.H_Register.data);
+                write_memory_ram(ramGateway, targetAddress, cpu.L_Register.data);
+
+                break;
+            }
+            // INX H
+            case 0x23:
+            {
+                uint16_t HL = (uint16_t) cpu.H_Register.data << 8 | cpu.L_Register.data;
+                HL++;
+
+                cpu.H_Register.data = (HL >> 8) & 0xFF;
+                cpu.L_Register.data = HL & 0xFF;
+            }
+            // INR H
+            case 0x24:
+            {
+                cpu.H_Register.data++;
+
+                // Update flags
+                cpu.flagRegister.zeroFlag = (cpu.H_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.H_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.H_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.H_Register.data);
+
+                break;
+            }
+            // DCR H
+            case 0x25:
+            {
+                cpu.H_Register.data--;
+
+                cpu.flagRegister.zeroFlag = (cpu.H_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.H_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.H_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.H_Register.data);
+
+                break;
+            }
+            // MVI H, D8
+            case 0x26:
+                cpu.programCounter.data++;
+                cpu.H_Register.data = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                break;
+            // DAA
+            // Decimal Adjust Accumulator
+            case 0x27:
+            {
+                char lowerNibble = cpu.A_Register.data & 0x0F;
+                char higherNibble = (cpu.A_Register.data >> 4) & 0x0F;
+
+                if (lowerNibble > 9 || cpu.flagRegister.auxiliaryCarry)
+                {
+                    cpu.A_Register.data += 6;
+                    cpu.flagRegister.auxiliaryCarry = (lowerNibble + 6) & 0x10;
+                }
+
+                if (higherNibble > 9 || cpu.flagRegister.carryFlag)
+                {
+                    uint16_t sum = cpu.A_Register.data + 0x60;
+                    cpu.A_Register.data = sum & 0xFF;
+
+                    cpu.flagRegister.carryFlag = sum & 0x100;
+                }
+
+                cpu.flagRegister.zeroFlag = (cpu.A_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.A_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.A_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data);
+
+                break;
+            }
+            // DAD H
+            // Wrong - in the documenation http://www.emulator101.com/reference/8080-by-opcode.html
+            // HL = HL + HI
+            // I REGISTER??? WHAT THE FUCK?
+            // Maybe this command try to HL = HL + HL?
+            // I don't know!
+            case 0x29:
+            {
+                uint16_t HL = (uint16_t) cpu.H_Register.data << 8 | cpu.L_Register.data;
+
+                uint16_t result = (uint16_t) HL + HL;
+                cpu.flagRegister.carryFlag = (result >> 16) & 0x01;
+
+                cpu.H_Register.data = (result >> 8) & 0xFF;
+                cpu.L_Register.data = result & 0xFF;
+
+                break;
+            }
+            // LHLD adr
+            case 0x2a:
+            {
+                cpu.programCounter.data++;
+                short low = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                cpu.programCounter.data++;
+                short high = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                uint16_t targetAddress = (high << 8) | low;
+
+                cpu.L_Register.data = read_memory_ram(ramGateway, targetAddress - 1);
+                cpu.H_Register.data = read_memory_ram(ramGateway, targetAddress);
+
+                break;
+            }
+            // DCX H
+            case 0x2b:
+            {
+                uint16_t HL = (cpu.H_Register.data << 8) | cpu.L_Register.data;
+                HL--;
+
+                cpu.H_Register.data = (HL >> 8) & 0xFF;
+                cpu.L_Register.data = HL & 0xFF;
+
+                break;
+            }
+            // INR L
+            case 0x2c:
+                cpu.L_Register.data++;
+
+                cpu.flagRegister.zeroFlag = (cpu.L_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.L_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.L_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.L_Register.data);
+
+                break;
+            // DCR L
+            case 0x2d:
+                cpu.L_Register.data--;
+
+                cpu.flagRegister.zeroFlag = (cpu.L_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.L_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.L_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.L_Register.data);
+
+                break;
+            // MVI L, D8
+            case 0x2e:
+                cpu.programCounter.data++;
+                cpu.L_Register.data = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                break;
+            // CMA
+            case 0x2f:
+                cpu.A_Register.data = ~cpu.A_Register.data;
+
+                break;
+            // LXI SP, D16
+            // Load 16-bit immediate data into Stack Pointer (SP)
+            case 0x31:
+            {
+                cpu.programCounter.data++;
+                short low = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                cpu.programCounter.data++;
+                short high = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                uint16_t targetAddress = (high << 8) | low;
+
+                short valueLow = read_memory_ram(ramGateway, targetAddress - 1);
+                short valueHigh = read_memory_ram(ramGateway, targetAddress);
+
+                cpu.programCounter.data = (valueHigh << 8) | valueLow;
+
+                break;
+            }
+            // STA adr
+            case 0x32:
+            {
+                cpu.programCounter.data++;
+                short low = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                cpu.programCounter.data++;
+                short high = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                uint16_t targetAddress = (high << 8) | low;
+
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.A_Register.data);
+
+                break;
+            }
+            // INX SP
+            case 0x33:
                 cpu.programCounter.data++;
 
                 break;
+            // INR M
+            // Increment the content of the memory cell whose address is specified by registers HL by 1
+            case 0x34:
+            {
+                uint16_t targetAddress = (uint16_t)cpu.H_Register.data << 8 | cpu.L_Register.data;
+
+                char value = read_memory_ram(ramGateway, targetAddress - 1);
+                value++;
+                write_memory_ram(ramGateway, targetAddress - 1, value);
+
+                cpu.flagRegister.zeroFlag = (value == 0);
+                cpu.flagRegister.signFlag = (value < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(value);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(value);
+
+                break;
+            }
+            // DCR M
+            // Decrement Memory
+            // Decrement the content of the memory cell whose address is specified
+            case 0x35:
+            {
+                uint16_t targetAddress = (uint16_t)cpu.H_Register.data << 8 | cpu.L_Register.data;
+
+                char value = read_memory_ram(ramGateway, targetAddress - 1);
+                value--;
+                write_memory_ram(ramGateway, targetAddress, value);
+
+                cpu.flagRegister.zeroFlag = (value == 0);
+                cpu.flagRegister.signFlag = (value < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(value);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(value);
+
+                break;
+            }
+            // MVI M, D8
+            case 0x36:
+            {
+                uint16_t targetAddress = (uint16_t)cpu.H_Register.data << 8 | cpu.L_Register.data;
+                cpu.programCounter.data++;
+
+                char value = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                write_memory_ram(ramGateway, targetAddress - 1, value);
+
+                break;
+            }
+            // STC
+            // Set the carry flag (CY) to 1
+            case 0x37:
+                cpu.flagRegister.carryFlag = 1;
+
+                break;
+            // DAD SP
+            case 0x39:
+            {
+                uint16_t HL = (uint16_t) cpu.H_Register.data << 8 | cpu.L_Register.data;
+                uint16_t stackPoitner = cpu.stackPointer.data;
+
+                uint16_t result = HL + stackPoitner;
+                cpu.flagRegister.carryFlag = (result >> 16) & 0x01;
+
+                cpu.H_Register.data = (unsigned char) (result >> 8);
+                cpu.L_Register.data = (unsigned char) result;
+
+                break;
+            }
+            // DCX SP
+            case 0x3b:
+                cpu.stackPointer.data--;
+
+                break;
+            // INR A
+            // Increment Register A
+            case 0x3c:
+                cpu.A_Register.data++;
+
+                cpu.flagRegister.zeroFlag = (cpu.A_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.A_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.A_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data);
+
+                break;
+            // DCR A
+            // Decrement Register A
+            case 0x3d:
+                cpu.A_Register.data++;
+
+                cpu.flagRegister.zeroFlag = (cpu.A_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.A_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.A_Register.data);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data);
+
+                break;
+            // MVI A, D8
+            // Move Immediate to Register A
+            case 0x3e:
+                cpu.programCounter.data++;
+                cpu.A_Register.data = read_memory_ram(ramGateway, cpu.programCounter.data);
+
+                break;
+            // CMC
+            // Complement Carry Flag
+            case 0x3f:
+                cpu.flagRegister.carryFlag = !cpu.flagRegister.carryFlag;
+
+                break;
+            // MOV B, B
+            case 0x40:
+                break;
+            // MOV B, C
+            case 0x41:
+                cpu.B_Register.data = cpu.C_Register.data;
+
+                break;
+            // MOV B, D
+            case 0x42:
+                cpu.B_Register.data = cpu.D_Register.data;
+
+                break;
+            // MOV B, E
+            case 0x43:
+                cpu.B_Register.data = cpu.E_Register.data;
+
+                break;
+            // MOV B, H
+            case 0x44:
+                cpu.B_Register.data = cpu.H_Register.data;
+
+                break;
+            // MOV B, M
+            // Move data from memory location addressed by HL to register B
+            case 0x46:
+            {
+                uint16_t targetAddress = (uint16_t) cpu.H_Register.data << 8 | cpu.L_Register.data;
+                cpu.B_Register.data = read_memory_ram(ramGateway, targetAddress - 1);
+
+                break;
+            }
+            // MOV B, A
+            // Move data from register A to register B
+            case 0x47:
+                cpu.B_Register.data = cpu.A_Register.data;
+                break;
+            // MOV C, B
+            // Move data from register B to register C
+            case 0x48:
+                cpu.C_Register.data = cpu.B_Register.data;
+                break;
+            // MOV C, C
+            // Move data from register C to register C (no operation)
+            case 0x49:
+                // No operation
+                break;
+            // MOV C, D
+            // Move data from register D to register C
+            case 0x4a:
+                cpu.C_Register.data = cpu.D_Register.data;
+                break;
+            // MOV C, E
+            // Move data from register E to register C
+            case 0x4b:
+                cpu.C_Register.data = cpu.E_Register.data;
+                break;
+            // MOV C, H
+            // Move data from register H to register C
+            case 0x4c:
+                cpu.C_Register.data = cpu.H_Register.data;
+                break;
+            // MOV C, L
+            // Move data from register L to register C
+            case 0x4d:
+                cpu.C_Register.data = cpu.L_Register.data;
+                break;
+            // MOV C, M
+            // Move data from memory location specified by HL to register C
+            case 0x4e:
+            {
+                uint16_t targetAddress = (uint16_t) cpu.H_Register.data << 8 | cpu.L_Register.data;
+
+                cpu.C_Register.data = read_memory_ram(ramGateway, targetAddress - 1);
+                break;
+            }
+            // MOV C, A
+            // Move data from register A to register C
+            case 0x4f:
+                cpu.C_Register.data = cpu.A_Register.data;
+                break;
+            // MOV D, B
+            // Move data from register B to register D
+            case 0x50:
+                cpu.D_Register.data = cpu.B_Register.data;
+                break;
+            // MOV D, C
+            // Move data from register C to register D
+            case 0x51:
+                cpu.D_Register.data = cpu.C_Register.data;
+                break;
+            // MOV D, D
+            // Move data from register D to register D (no operation)
+            case 0x52:
+                // No operation
+                break;
+            // MOV D, E
+            // Move data from register E to register D
+            case 0x53:
+                cpu.D_Register.data = cpu.E_Register.data;
+                break;
+            // MOV D, H
+            // Move data from register H to register D
+            case 0x54:
+                cpu.D_Register.data = cpu.H_Register.data;
+                break;
+            // MOV D, L
+            // Move data from register L to register D
+            case 0x55:
+                cpu.D_Register.data = cpu.L_Register.data;
+                break;
+            // MOV D, M
+            // Move data from memory location specified by HL to register D
+            case 0x56:
+            {
+                uint16_t targetAddress = (uint16_t)cpu.H_Register.data << 8 | cpu.L_Register.data;
+
+                cpu.D_Register.data = read_memory_ram(ramGateway, targetAddress - 1);
+                break;
+            }
+            // MOV D, A
+            // Move data from register A to register D
+            case 0x57:
+                cpu.D_Register.data = cpu.A_Register.data;
+                break;
+            // MOV E, B
+            // Move data from register B to register E
+            case 0x58:
+                cpu.E_Register.data = cpu.B_Register.data;
+                break;
+            // MOV E, C
+            // Move data from register C to register E
+            case 0x59:
+                cpu.E_Register.data = cpu.C_Register.data;
+                break;
+            // MOV E, D
+            // Move data from register D to register E
+            case 0x5a:
+                cpu.E_Register.data = cpu.D_Register.data;
+                break;
+            // MOV E, E
+            // Move data from register E to register E (no operation)
+            case 0x5b:
+                // No operation
+                break;
+            // MOV E, H
+            // Move data from register H to register E
+            case 0x5c:
+                cpu.E_Register.data = cpu.H_Register.data;
+                break;
+            // MOV E, L
+            // Move data from register L to register E
+            case 0x5d:
+                cpu.E_Register.data = cpu.L_Register.data;
+                break;
+            // MOV E, M
+            // Move data from memory location specified by HL to register E
+            case 0x5e:
+            {
+                uint16_t targetAddress = (uint16_t)cpu.H_Register.data << 8 | cpu.L_Register.data;
+
+                cpu.E_Register.data = read_memory_ram(ramGateway, targetAddress - 1);
+                break;
+            }
+            // MOV E, A
+            // Move data from register A to register E
+            case 0x5f:
+                cpu.E_Register.data = cpu.A_Register.data;
+                break;
+            // MOV H, B
+            // Move data from register B to register H
+            case 0x60:
+                cpu.H_Register.data = cpu.B_Register.data;
+                break;
+            // MOV H, C
+            // Move data from register C to register H
+            case 0x61:
+                cpu.H_Register.data = cpu.C_Register.data;
+                break;
+            // MOV H, D
+            // Move data from register D to register H
+            case 0x62:
+                cpu.H_Register.data = cpu.D_Register.data;
+                break;
+            // MOV H, E
+            // Move data from register E to register H
+            case 0x63:
+                cpu.H_Register.data = cpu.E_Register.data;
+                break;
+            // MOV H, H
+            // Move data from register H to register H (no operation)
+            case 0x64:
+                // No operation
+                break;
+            // MOV H, L
+            // Move data from register L to register H
+            case 0x65:
+                cpu.H_Register.data = cpu.L_Register.data;
+                break;
+            // MOV H, M
+            // Move data from memory location specified by HL to register H
+            case 0x66:
+            {
+                uint16_t targetAddress = (uint16_t) cpu.H_Register.data << 8 | cpu.L_Register.data;
+
+                cpu.H_Register.data = read_memory_ram(ramGateway, targetAddress - 1);
+                break;
+            }
+            // MOV H, A
+            // Move data from register A to register H
+            case 0x67:
+                cpu.H_Register.data = cpu.A_Register.data;
+                break;
+            // MOV L, B
+            // Move data from register B to register L
+            case 0x68:
+                cpu.L_Register.data = cpu.B_Register.data;
+                break;
+            // MOV L, C
+            // Move data from register C to register L
+            case 0x69:
+                cpu.L_Register.data = cpu.C_Register.data;
+                break;
+            // MOV L, D
+            // Move data from register D to register L
+            case 0x6a:
+                cpu.L_Register.data = cpu.D_Register.data;
+                break;
+            // MOV L, E
+            // Move data from register E to register L
+            case 0x6b:
+                cpu.L_Register.data = cpu.E_Register.data;
+                break;
+            // MOV L, H
+            // Move data from register H to register L
+            case 0x6c:
+                cpu.L_Register.data = cpu.H_Register.data;
+                break;
+            // MOV L, L
+            // Move data from register L to register L (no operation)
+            case 0x6d:
+                // No operation
+                break;
+            // MOV L, M
+            case 0x6e:
+            {
+                uint16_t targetAddress = (uint16_t) (cpu.H_Register.data << 8) | cpu.L_Register.data;
+                cpu.L_Register.data = read_memory_ram(ramGateway, targetAddress - 1);
+
+                break;
+            }
+            // MOV L, A
+            case 0x6f:
+            {
+                cpu.L_Register.data = cpu.A_Register.data;
+
+                break;
+            }
+            // MOV M, B
+            case 0x70:
+            {
+                uint16_t targetAddress = (uint16_t) (cpu.H_Register.data << 8) | cpu.L_Register.data;
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.B_Register.data);
+
+                break;
+            }
+            // MOV M, C
+            case 0x71:
+            {
+                uint16_t targetAddress = (uint16_t)(cpu.H_Register.data << 8) | cpu.L_Register.data;
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.C_Register.data);
+
+                break;
+            }
+            // MOV M, D
+            case 0x72:
+            {
+                uint16_t targetAddress = (uint16_t)(cpu.H_Register.data << 8) | cpu.L_Register.data;
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.D_Register.data);
+
+                break;
+            }
+            // MOV M, E
+            case 0x73:
+            {
+                uint16_t targetAddress = (uint16_t) (cpu.H_Register.data << 8) | cpu.L_Register.data;
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.E_Register.data);
+
+                break;
+            }
+            // MOV M, H
+            case 0x74:
+            {
+                uint16_t targetAddress = (uint16_t) (cpu.H_Register.data << 8) | cpu.L_Register.data;
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.H_Register.data);
+
+                break;
+            }
+            // MOV M, L
+            case 0x75:
+            {
+                uint16_t targetAddress = (uint16_t) (cpu.H_Register.data << 8) | cpu.L_Register.data;
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.H_Register.data);
+
+                break;
+            }
+            // HLT
+            // Halt mode
+            case 0x76:
+                break;
+            // MOV M, A
+            case 0x77:
+            {
+                uint16_t targetAddress = (uint16_t) (cpu.H_Register.data << 8) | cpu.L_Register.data;
+                write_memory_ram(ramGateway, targetAddress - 1, cpu.A_Register.data);
+
+                break;
+            }
+            // MOV A, B
+            case 0x78:
+                cpu.A_Register.data = cpu.B_Register.data;
+                break;
+            // MOV A,C
+            // Move content of register C to A
+            case 0x79:
+                cpu.A_Register.data = cpu.C_Register.data;
+                break;
+            // MOV A,D
+            // Move content of register D to A
+            case 0x7a:
+                cpu.A_Register.data = cpu.D_Register.data;
+                break;
+            // MOV A,E
+            // Move content of register E to A
+            case 0x7b:
+                cpu.A_Register.data = cpu.E_Register.data;
+                break;
+            // MOV A,H
+            // Move content of register H to A
+            case 0x7c:
+                cpu.A_Register.data = cpu.H_Register.data;
+                break;
+            // MOV A,L
+            // Move content of register L to A
+            case 0x7d:
+                cpu.A_Register.data = cpu.L_Register.data;
+                break;
+            // MOV A, M
+            case 0x7e:
+            {
+                uint16_t targetAddress = (uint16_t) (cpu.H_Register.data << 8) | cpu.L_Register.data;
+                cpu.A_Register.data = read_memory_ram(ramGateway, targetAddress - 1);
+
+                break;
+            }
+            // MOV A, A
+            case 0x7f:
+                break;
+            // ADD B
+            case 0x80:
+            {
+                unsigned char sum = cpu.A_Register.data + cpu.B_Register.data;
+
+                cpu.flagRegister.zeroFlag = (sum == 0);
+                cpu.flagRegister.signFlag = (sum < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
+                cpu.flagRegister.carryFlag = (sum > 0xFF);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+
+                cpu.A_Register.data = sum;
+
+                break;
+            }
+            // ADD C
+            case 0x81:
+            {
+                unsigned char sum = cpu.A_Register.data + cpu.C_Register.data;
+
+                cpu.flagRegister.zeroFlag = (sum == 0);
+                cpu.flagRegister.signFlag = (sum < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
+                cpu.flagRegister.carryFlag = (sum > 0xFF);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+
+                cpu.A_Register.data = sum;
+
+                break;
+            }
+            // ADD D
+            case 0x82:
+            {
+                unsigned char sum = cpu.A_Register.data + cpu.D_Register.data;
+
+                cpu.flagRegister.zeroFlag = (sum == 0);
+                cpu.flagRegister.signFlag = (sum < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
+                cpu.flagRegister.carryFlag = (sum > 0xFF);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+
+                cpu.A_Register.data = sum;
+
+                break;
+            }
+            // ADD E
+            case 0x83:
+            {
+                unsigned char sum = cpu.A_Register.data + cpu.E_Register.data;
+
+                cpu.flagRegister.zeroFlag = (sum == 0);
+                cpu.flagRegister.signFlag = (sum < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
+                cpu.flagRegister.carryFlag = (sum > 0xFF);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+
+                cpu.A_Register.data = sum;
+
+                break;
+            }
+            // ADD H
+            case 0x84:
+            {
+                char sum = cpu.A_Register.data + cpu.H_Register.data;
+
+                cpu.flagRegister.zeroFlag = (sum == 0);
+                cpu.flagRegister.signFlag = (sum < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
+                cpu.flagRegister.carryFlag = (sum > 0xFF);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+
+                cpu.A_Register.data = sum;
+
+                break;
+            }
+            // ADD L
+            case 0x85:
+            {
+                char sum = cpu.A_Register.data + cpu.L_Register.data;
+
+                cpu.flagRegister.zeroFlag = (sum == 0);
+                cpu.flagRegister.signFlag = (sum < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(sum & 0xFF);
+                cpu.flagRegister.carryFlag = (sum > 0xFF);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data, cpu.B_Register.data);
+
+                cpu.A_Register.data = sum;
+
+                break;
+            }
         }
 
         cpu.programCounter.data++;

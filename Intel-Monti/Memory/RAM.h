@@ -10,7 +10,6 @@
 // The Intel 8080 processor stored 1 byte of information in a single memory cell
 struct RAM_MemoryBlock
 {
-	unsigned short memoryAddress;
 	char rawByte;
 } typedef RAM_MemoryBlock;
 

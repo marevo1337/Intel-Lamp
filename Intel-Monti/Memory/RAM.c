@@ -9,7 +9,6 @@ RAM* init_ram()
 
     for (int i = 0; i < RAM_MEMORY_SIZE; i++)
     {
-        memoryBlocks[i].memoryAddress = i + 1;
         memoryBlocks[i].rawByte = 0;
     }
 
