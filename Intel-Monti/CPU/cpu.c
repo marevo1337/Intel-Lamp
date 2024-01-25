@@ -1076,6 +1076,26 @@ void execute_cpu(CPU cpu, RAM* ramGateway)
 
                 break;
             }
+            // ADD M
+            case 0x86:
+            {
+                uint16_t targetAddress = (uint16_t)(cpu.H_Register.data << 8) | cpu.L_Register.data;
+
+                char value = read_memory_ram(ramGateway, targetAddress - 1);
+
+                cpu.A_Register.data = cpu.A_Register.data + value;
+
+                cpu.flagRegister.zeroFlag = (cpu.A_Register.data == 0);
+                cpu.flagRegister.signFlag = (cpu.A_Register.data < 0);
+                cpu.flagRegister.partyFlag = is_bits_even(cpu.A_Register.data & 0xFF);
+                cpu.flagRegister.carryFlag = (cpu.A_Register.data > 0xFF);
+                cpu.flagRegister.auxiliaryCarry = is_auxiliary_carry_set(cpu.A_Register.data);
+
+                break;
+            }
+            // ADD A
+            case 0x87:
+                break;
             // OUT D8
             case 0xd3:
             {
